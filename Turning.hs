@@ -11,13 +11,13 @@ data Transition    = (InTransition, OutTransition)
 --read
   --the following variables will be instantiated
 --States :: [State]
---  States   = ints between {} and before 1st ;
+--  states   = ints between {} and before 1st ;
 --Alphabet :: [Alpha]
---  Alphabet = char between {} and before 2nd ;
+--  alphabet = char between {} and before 2nd ;
 --Tape :: [TapeA]
---  Tape     = char between {} and before 3rd ;
+--  tape     = char between {} and before 3rd ;
 --Transitions :: [Transition]
---  Transitions = transitions before 4th ;
+--  transitions = transitions before 4th ;
 --startingState :: State
 --  startingState = state before 5th ;
 --empty :: TapeA
@@ -27,7 +27,7 @@ data Transition    = (InTransition, OutTransition)
 
 
 isValid :: String -> Bool
-isValid x = x `elem` Alphabet
+isValid x = x `elem` alphabet
 
 --[Transition] == [(InTransition, OutTransition)] == [( (State,Alpha) , (State,TapeA,Char) )]
 canTransition :: [Transition] -> InTransition -> Transition
@@ -36,7 +36,7 @@ canTransition (t:ts) (s,a) | first (first t) == s && second (first t) == a = sec
                            | otherwise = findTransition ts (s,a)
 --take in currentState, head of the inputString, currentTapePointer, Tape
 --returns new State, new TapePosition, newTape
-update :: State -> String -> Integer -> String -> (State, Integer, String)
+update :: state -> String -> Integer -> String -> (State, Integer, String)
 update s i tp t = let trans  = canTransition (s,i)
                       tpoint a | a == 'L' || a == 'l' = -1
                                | a == 'R' || a == 'r' = 1
@@ -44,8 +44,17 @@ update s i tp t = let trans  = canTransition (s,i)
                       nTape a b (x:xs) | a == 0 = (b:xs)
                                        | a > 0  = x:(ntape (a-1) b xs)
                   in ((first trans), (tpoint (third trans)), (nTape tp (second trans) t))
-                        
-                     
+
+currentPointer = 1;
+tape = [empty:empty:empty]
+turing -1 _ _ _ = -1
+turing currentState currentPointer tape (x:xs)  | isValid x && currentState >= 0 =  let u = update currentState currentPointer, tape
+                                                                                        a = first u
+                                                                                        b = second (u)
+                                                                                        c = currentPointer + third (a’ )
+                                                                                    in  turing (a b c xs)
+                                                | otherwise = -1
+turing currentState _ _ [] = currentState
 
 first :: a -> b
 first (x:y:z:s) = x
