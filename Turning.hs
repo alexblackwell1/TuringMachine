@@ -59,13 +59,13 @@ currentPointer = 1;
 tape = [empty:empty:empty]
 turing :: State -> Integer -> [TapeA] -> String -> State
 turing -1 _ _ _ = -1
-turing currentState currentPointer tape (x:xs)  | isValid x && currentState >= 0 =  let u = update currentState currentPointer, tape
+turing currentState _ _ [] = currentState
+turing currentState currentPointer tape (x:xs)  | isValid x && currentState >= 0 =  let u = update currentState currentPointer tape
                                                                                         a = first u
-                                                                                        b = second (u)
-                                                                                        c = currentPointer + third (a’ )
+                                                                                        b = second u
+                                                                                        c = currentPointer + (third u)
                                                                                     in  turing (a b c xs)
                                                 | otherwise = -1
-turing currentState _ _ [] = currentState
 
 isFinal :: State -> Bool
 isFinal s = s `elem` states
