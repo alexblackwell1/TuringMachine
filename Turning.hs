@@ -26,6 +26,16 @@ data Transition    = (InTransition, OutTransition)
 --  accState = states between {} before 7th ;
 
 
+
+first :: a -> b
+first (x:y:z:s) = x
+
+second :: a -> b
+second (x:y:z:s) = y
+
+third :: a -> b
+third (x:y:z:s) = z
+
 isValid :: String -> Bool
 isValid x = x `elem` alphabet
 
@@ -60,13 +70,7 @@ turing currentState _ _ [] = currentState
 isFinal :: State -> Bool
 isFinal s = s `elem` states
 
-first :: a -> b
-first (x:y:z:s) = x
 
-second :: a -> b
-second (x:y:z:s) = y
 
-third :: a -> b
-third (x:y:z:s) = z
 
 
