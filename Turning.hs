@@ -10,13 +10,13 @@ data Transition    = (InTransition, OutTransition)
 
 --read
   --the following variables will be instantiated
---States :: [State]
+--states :: [State]
 --  states   = ints between {} and before 1st ;
---Alphabet :: [Alpha]
+--alphabet :: [Alpha]
 --  alphabet = char between {} and before 2nd ;
---Tape :: [TapeA]
+--tape :: [TapeA]
 --  tape     = char between {} and before 3rd ;
---Transitions :: [Transition]
+--transitions :: [Transition]
 --  transitions = transitions before 4th ;
 --startingState :: State
 --  startingState = state before 5th ;
@@ -47,6 +47,7 @@ update s i tp t = let trans  = canTransition (s,i)
 
 currentPointer = 1;
 tape = [empty:empty:empty]
+turing :: State -> Integer -> [TapeA] -> String -> State
 turing -1 _ _ _ = -1
 turing currentState currentPointer tape (x:xs)  | isValid x && currentState >= 0 =  let u = update currentState currentPointer, tape
                                                                                         a = first u
@@ -55,6 +56,9 @@ turing currentState currentPointer tape (x:xs)  | isValid x && currentState >= 0
                                                                                     in  turing (a b c xs)
                                                 | otherwise = -1
 turing currentState _ _ [] = currentState
+
+isFinal :: State -> Bool
+isFinal s = s `elem` states
 
 first :: a -> b
 first (x:y:z:s) = x
