@@ -8,17 +8,18 @@ data InTransition  = (State, Alpha)
 data OutTransition = (State, TapeA, Char)
 data Transition    = (InTransition, OutTransition)
 
--- M = (Q, X, ∑, δ, q0, B, F)
-  -- Q = {q0, q1, q2, qf}
-  -- X = {a, b}
-  -- ∑ = {1}
-  -- q0 = {q0}
-  -- B = blank symbol
-  -- F = {qf }
+-- File Template
+-- M = ({q1, q2, q3, ...}, {0,1,a,b,_, ...}, {a,b,...}, D, q0, _, {q2, q3, ...})
+  -- where D = 
+  -- d(q1, a) = (q3, 0, R)
+  -- d(q3, 0) = (q1, a, L)
+  -- ...
+-- where states DO start with q then # and the tape/alphabet cannot have characters that start with q or d/D
+-- where the tape alphabet includes the input alphabet and the blank symbol
 
---data Token = StateSet | TapeSet | AlphaSet | StartState | Blank | FinalSet
---  | KwState State | KwTape TapeA | KwAlpha Alpha 
---  | Comma | LBrace | RBrace | Eql
+--data Token = Machine | StateSet | TapeSet | AlphaSet | StartState | Blank | FinalSet
+--  | KwState State | KwTape TapeA | KwAlpha Alpha | Kw String
+--  | Comma | LBrace | RBrace | LPar | RPar | Eql
 --  | Err deriving Show
 
 --read
@@ -48,6 +49,25 @@ second (x:y:z:s) = y
 
 third :: a -> b
 third (x:y:z:s) = z
+
+isAlpha :: Char -> Bool
+isAlpha x = ('A' <= x && x <= 'Z') || ('a' <= x && x <= 'z')
+
+isDigit :: Char -> Bool
+isDigit x = '0' <= x && x <= '9'
+
+isState :: String -> Bool
+isState "" = False
+isState ('q':x:xs) | isDigit x = 
+  let q1 "" = True
+      q1 (x:xs) | isDigit x = q1 xs
+  in  q1 xs
+isState _ = False
+
+toState :: String -> State
+toState ('q':xs)  = toState xs
+toState (x:xs)    = (read x) : toState xs
+toState []        = []
 
 isValid :: String -> Bool
 isValid x = x `elem` alphabet
