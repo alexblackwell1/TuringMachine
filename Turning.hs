@@ -8,6 +8,19 @@ data InTransition  = (State, Alpha)
 data OutTransition = (State, TapeA, Char)
 data Transition    = (InTransition, OutTransition)
 
+-- M = (Q, X, ∑, δ, q0, B, F)
+  -- Q = {q0, q1, q2, qf}
+  -- X = {a, b}
+  -- ∑ = {1}
+  -- q0 = {q0}
+  -- B = blank symbol
+  -- F = {qf }
+
+--data Token = StateSet | TapeSet | AlphaSet | StartState | Blank | FinalSet
+--  | KwState State | KwTape TapeA | KwAlpha Alpha 
+--  | Comma | LBrace | RBrace | Eql
+--  | Err deriving Show
+
 --read
   --the following variables will be instantiated
 --states :: [State]
