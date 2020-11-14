@@ -58,16 +58,22 @@ isDigit x = '0' <= x && x <= '9'
 
 isState :: String -> Bool
 isState "" = False
-isState ('q':x:xs) | isDigit x = 
+isState ('q':x:xs) = 
   let q1 "" = True
       q1 (x:xs) | isDigit x = q1 xs
-  in  q1 xs
+      q1 _ = False
+  in  isDigit x && q1 xs
 isState _ = False
 
 toState :: String -> State
 toState ('q':xs)  = toState xs
 toState (x:xs)    = (read x) : toState xs
 toState []        = []
+
+-- Anything that can be in the INPUT or TAPE alphabet
+isAlphabet :: String -> Bool
+isAlphabet "" = False
+isAlphabet (x:xs) = (x /= 'q') && (x /= 'd') && (x /= 'D')
 
 isValid :: String -> Bool
 isValid x = x `elem` alphabet
