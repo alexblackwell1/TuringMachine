@@ -17,10 +17,32 @@ data Transition    = (InTransition, OutTransition)
 -- where states DO start with q then # and the tape/alphabet cannot have characters that start with q or d/D
 -- where the tape alphabet includes the input alphabet and the blank symbol
 
---data Token = Machine | StateSet | TapeSet | AlphaSet | StartState | Blank | FinalSet
---  | KwState State | KwTape TapeA | KwAlpha Alpha | Kw String
---  | Comma | LBrace | RBrace | LPar | RPar | Eql
+--data Token = Machine | StateSet | TapeSet | AlphaSet | Delta | StartState | Blank | FinalSet
+--  | KeywordState State | KeywordTape TapeA | KeywordAlpha Alpha | Keyword String
+--  | Comma | LBracket | RBracket | LPar | RPar | Eql
 --  | Err deriving Show
+
+--or
+
+--data Token = Machine | Delta
+--  | KeywordState State | KeywordAlphabet TapeA | Keyword String
+--  | Comma | LBracket | RBracket | LPar | RPar | Eql
+--  | Err deriving Show
+
+--classify :: String -> Token
+--classify "M" = Machine
+--classify "=" = Eql
+--classify "(" = LPar
+--classify ")" = RPap
+--classify "{" = LBracket
+--classify "}" = RBracket
+--classify "," = Comma
+--classify "D" = Delta
+--classify "where" = Keyword "where"
+--classify x | isState x = KeywordState (toState x)
+--classify x | isAlphabet x = 
+--classify 
+--classify 
 
 --read
   --the following variables will be instantiated
