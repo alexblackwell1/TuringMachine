@@ -104,11 +104,11 @@ isValid x = x `elem` alphabet
 canTransition :: [Transition] -> InTransition -> Transition
 canTransition [] _ = null
 canTransition (t:ts) (s,a) | first (first t) == s && second (first t) == a = second t
-                           | otherwise = findTransition ts (s,a)
+                           | otherwise = canTransition ts (s,a)
 --take in currentState, head of the inputString, currentTapePointer, Tape
 --returns new State, new TapePosition, newTape
 update :: state -> String -> Integer -> String -> (State, Integer, String)
-update s i tp t = let trans  = canTransition (s,i)
+update s i tp t = let trans  = canTransition transitions (s,i)
                       tpoint a | a == 'L' || a == 'l' = -1
                                | a == 'R' || a == 'r' = 1
                                | otherwise = 0
