@@ -9,41 +9,44 @@ data OutTransition = (State, TapeA, Char)
 data Transition    = (InTransition, OutTransition)
 
 -- File Template
--- M = ({q1, q2, q3, ...}, {0,1,a,b,_, ...}, {a,b,...}, D, q0, _, {q2, q3, ...})
-  -- where D = 
+--({q1, q2, q3, ...}; {0,1,a,b,_, ...}; {a,b,...}; D; q0; _; {q2, q3, ...})
   -- d(q1, a) = (q3, 0, R)
   -- d(q3, 0) = (q1, a, L)
   -- ...
 -- where states DO start with q then # and the tape/alphabet cannot have characters that start with q or d/D
 -- where the tape alphabet includes the input alphabet and the blank symbol
 
---data Token = Machine | StateSet | TapeSet | AlphaSet | Delta | StartState | Blank | FinalSet
---  | KeywordState State | KeywordTape TapeA | KeywordAlpha Alpha | Keyword String
+--data Token = StateSet | TapeSet | AlphaSet | StartState | Blank | FinalSet
+--  | KeywordState State | KeywordTape TapeA | KeywordAlpha Alpha
 --  | Comma | Semi | LBracket | RBracket | LPar | RPar | Eql
 --  | Err deriving Show
 
---or
+--or (thinking ^ is wrong)
 
---data Token = Machine | Delta
---  | KeywordState State | KeywordAlphabet TapeA | Keyword String
---  | Comma | LBracket | RBracket | LPar | RPar | Eql
---  | Err deriving Show
+data Token = Machine | Delta
+  | KeywordState State | KeywordAlphabet Char | Keyword String
+  | Comma | LBracket | RBracket | LPar | RPar | Eql
+  | Err deriving Show
 
---classify :: String -> Token
---classify "M" = Machine
---classify "=" = Eql
---classify "(" = LPar
---classify ")" = RPap
---classify "{" = LBracket
---classify "}" = RBracket
---classify "," = Comma
---classify "D" = Delta 
---classify ";"
---classify "where" = Keyword "where"
---classify x | isState x = KeywordState (toState x)
---classify x | isAlphabet x = 
---classify 
---classify 
+classify :: String -> Token
+classify "=" = Eql
+classify "(" = LPar
+classify ")" = RPap
+classify "{" = LBracket
+classify "}" = RBracket
+classify "," = Comma
+classify ";"
+classify x | isState x = KeywordState (toState x)
+classify x | isAlphabet x = KeywordAlpha x --one of the last parts that needs to be defined
+
+sr :: [Token] -> [Token] -> [State] -> [Alpha] -> [TapeA] -> [Transition] -> State -> TapeA -> [State] -> ([State], [Alpha], [TapeA], [Transition], State, TapeA, [State])
+sr [] (x:xs) _ _ _ _ _ _ _ = sr [x] xs _ _ _ _ _ _ _
+sr (LPar : ts) l _ tape _ _ _ _ _   | tape == [] = sr ts l _ _ _ _ _ _ _
+                                    | --otherwise is a transition
+sr (RPar : ts) l _ tape _ _ _ _ _   | -- will be different because it is at end of file
+sr () _ _ _ _ _ _ _ _ = 
+sr _ _ _ _ _ _ _ _ _ = 
+sr _ _ _ _ _ _ _ _ _ = 
 
 --read
   --the following variables will be instantiated
@@ -96,7 +99,7 @@ toState []        = []
 -- Anything that can be in the INPUT or TAPE alphabet
 isAlphabet :: String -> Bool
 isAlphabet "" = False
-isAlphabet (x:xs) = (x /= 'q') && (x /= 'd') && (x /= 'D')
+isAlphabet (x:xs) = (x /= 'q') && (x /= 'd')
 
 isValid :: String -> Bool
 isValid x = x `elem` alphabet
