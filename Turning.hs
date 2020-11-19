@@ -19,7 +19,7 @@ data Transition    = (InTransition, OutTransition)
 
 --data Token = Machine | StateSet | TapeSet | AlphaSet | Delta | StartState | Blank | FinalSet
 --  | KeywordState State | KeywordTape TapeA | KeywordAlpha Alpha | Keyword String
---  | Comma | LBracket | RBracket | LPar | RPar | Eql
+--  | Comma | Semi | LBracket | RBracket | LPar | RPar | Eql
 --  | Err deriving Show
 
 --or
@@ -37,7 +37,8 @@ data Transition    = (InTransition, OutTransition)
 --classify "{" = LBracket
 --classify "}" = RBracket
 --classify "," = Comma
---classify "D" = Delta
+--classify "D" = Delta 
+--classify ";"
 --classify "where" = Keyword "where"
 --classify x | isState x = KeywordState (toState x)
 --classify x | isAlphabet x = 
