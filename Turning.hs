@@ -95,9 +95,9 @@ toState :: String -> State
 toState ('q':xs)  = read xs
 
 -- Anything that can be in the INPUT or TAPE alphabet
-isTapeA :: String -> Bool
+isTapeA :: Char -> Bool
 isTapeA "" = False
-isTapeA (x:xs) = (x /= 'q') && (x /= 'd')
+isTapeA x = (x /= 'q') && (x /= 'd')
 
 isValid :: String -> Bool
 isValid x = x `elem` alphabet
