@@ -3,9 +3,9 @@
 --Variables
 type State = int
 type TapeA = Char
-type Alpha = Char
-data InTransition  = (State, Alpha)
-data OutTransition = (State, TapeA, Char)
+type Direction = L | R
+data InTransition  = (State, TapeA)
+data OutTransition = (State, TapeA, Direction)
 data Transition    = (InTransition, OutTransition)
 
 -- File Template
@@ -24,8 +24,8 @@ data Transition    = (InTransition, OutTransition)
 --or (thinking ^ is wrong)
 
 data Token = Machine | Delta
-  | KeywordState State | KeywordAlphabet Char | Keyword String
-  | Comma | LBracket | RBracket | LPar | RPar | Eql
+  | KeywordState State | KeywordTape TapeA | Keyword String
+  | Comma | Semi | LBracket | RBracket | LPar | RPar | Eql
   | Err deriving Show
 
 classify :: String -> Token
@@ -35,16 +35,33 @@ classify ")" = RPap
 classify "{" = LBracket
 classify "}" = RBracket
 classify "," = Comma
-classify ";"
+classify ";" = Semi
 classify x | isState x = KeywordState (toState x)
-classify x | isAlphabet x = KeywordAlpha x --one of the last parts that needs to be defined
+classify x | isTape x = KeywordTape x --one of the last parts that needs to be defined
 
-sr :: [Token] -> [Token] -> [State] -> [Alpha] -> [TapeA] -> [Transition] -> State -> TapeA -> [State] -> ([State], [Alpha], [TapeA], [Transition], State, TapeA, [State])
-sr [] (x:xs) _ _ _ _ _ _ _ = sr [x] xs _ _ _ _ _ _ _
-sr (LPar : ts) l _ tape _ _ _ _ _   | tape == [] = sr ts l _ _ _ _ _ _ _
+-- input 0 for current. It stands for the current part of the tuple being processed
+sr :: [Token] -> [State] -> [TapeA] -> [TapeA] -> [Transition] -> State -> TapeA -> [State] -> Integer -> ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
+-- I don't think we'll need the transition stack
+-- sr [] (x:xs) states tape alpha trans start empty final current = sr [x] xs states tape alpha trans start empty final current
+sr (LPar : xs) l s t a tr st e f c  | c == 0 = sr xs l s t a tr st e f (c+1)
                                     | --otherwise is a transition
-sr (RPar : ts) l _ tape _ _ _ _ _   | -- will be different because it is at end of file
-sr () _ _ _ _ _ _ _ _ = 
+sr (RPar : xs) l s t a tr st e f c  | c == 7 = sr xs l s t a  tr st e f 4
+                                    | -- otherwise is a transition
+sr (LBracket : xs) l s t a tr st e f c = sr xs l s t a tr st e f c
+sr (RBracket : xs) l s t a tr st e f c = sr xs l s t a tr st e f c
+sr (KeywordState x : xs)  l s t a tr st e f c | c == 1 = sr xs l (x:s) t a tr st e f c
+                                              | c == 5 = sr xs l s t a tr x e f c
+                                              | otherwise = sr xs l s t a tr st e (x:f) c
+sr (KeywordTape x : xs)  l s t a tr st e f c | c == 2 = sr xs l s (x:t) a tr st e f c
+                                                 | c == 
+sr (Semi : xs) l s t a tr st e f c = sr xs l s t a  tr st e f (c+1)
+sr (Comma : xs) l s t a tr st e f c = sr xs l s t a tr st e f c
+sr _ _ _ _ _ _ _ _ _ = 
+sr _ _ _ _ _ _ _ _ _ = 
+sr _ _ _ _ _ _ _ _ _ = 
+sr _ _ _ _ _ _ _ _ _ = 
+sr _ _ _ _ _ _ _ _ _ = 
+sr _ _ _ _ _ _ _ _ _ = 
 sr _ _ _ _ _ _ _ _ _ = 
 sr _ _ _ _ _ _ _ _ _ = 
 
@@ -52,7 +69,7 @@ sr _ _ _ _ _ _ _ _ _ =
   --the following variables will be instantiated
 --states :: [State]
 --  states   = ints between {} and before 1st ;
---alphabet :: [Alpha]
+--alphabet :: [TapeA]
 --  alphabet = char between {} and before 2nd ;
 --tape :: [TapeA]
 --  tape     = char between {} and before 3rd ;
@@ -97,9 +114,9 @@ toState (x:xs)    = (read x) : toState xs
 toState []        = []
 
 -- Anything that can be in the INPUT or TAPE alphabet
-isAlphabet :: String -> Bool
-isAlphabet "" = False
-isAlphabet (x:xs) = (x /= 'q') && (x /= 'd')
+isTape :: String -> Bool
+isTape "" = False
+isTape (x:xs) = (x /= 'q') && (x /= 'd')
 
 isValid :: String -> Bool
 isValid x = x `elem` alphabet
