@@ -128,26 +128,46 @@ update s i tp t = let trans  = canTransition transitions (s,i)
                   in ((first trans), (tpoint (third trans)), (nTape tp (second trans) t))
 
 -- pointer points to element in the tape. If the pointer is ever > or < the tape, add a blank element in front
-tape = inputTape
 -- take in current state, position of the pointer, tape, and input string
-turing :: State -> Integer -> [TapeA] -> String -> State
-turing -1 _ _ _ = -1
-turing currentState _ _ [] = currentState
-turing s p t (x:xs) | isValid x && s >= 0 && p > 0 && p < (length t) =  let u = update s p t
-                                                                            a = first u
-                                                                            b = second u
-                                                                            c = currentPointer + (third u)
-                                                                        in  turing (a b c xs)
+--turing :: State -> Integer -> [TapeA] -> String -> State
+--turing -1 _ _ _ = -1
+--turing currentState _ _ [] = currentState
+--turing s p t (x:xs) | isValid x && s >= 0 && p > 0 && p < (length t) =  let u = update s p t
+--                                                                            a = first u
+--                                                                            b = second u
+--                                                                            c = currentPointer + (third u)
+--                                                                        in  turing (a b c xs)
+--                    | isValid x && s >= 0 && p == 0 = let u = update s 1 (blank:t)
+--                                                          a = first u
+--                                                          b = second u
+--                                                          c = currentPointer + (third u)
+--                                                      in  turing (a b c xs)
+--                    | isValid x && s >= 0 && p > (length t) = let u = update s p (t++[blank])
+--                                                                  a = first u
+--                                                                  b = second u
+--                                                                  c = currentPointer + (third u)
+--                                                              in  turing (a b c xs)
+--                    | otherwise = -1
+
+-- take in current state, position of the pointer, tape
+turing :: State -> Integer -> [TapeA] -> State
+turing -1 _ _ = -1
+--turing currentState _ _ [] = currentState
+turing s p (t:ts) | isValid t && s >= 0 && p > 0 && p < (length (t:ts)) = let u = update s p (t:ts)
+                                                                              a = first u
+                                                                              b = currentPointer + (second u)
+                                                                              c = third u
+                                                                          in  turing (a b c)
                     | isValid x && s >= 0 && p == 0 = let u = update s 1 (blank:t)
                                                           a = first u
-                                                          b = second u
-                                                          c = currentPointer + (third u)
-                                                      in  turing (a b c xs)
-                    | isValid x && s >= 0 && p > (length t) = let u = update s p (t++[blank])
-                                                                  a = first u
-                                                                  b = second u
-                                                                  c = currentPointer + (third u)
-                                                              in  turing (a b c xs)
+                                                          b = currentPointer + (second u)
+                                                          c = third u
+                                                      in  turing (a b c)
+                    | isValid x && s >= 0 && p > (length (t:ts)) =  let u = update s p (t++[blank])
+                                                                        a = first u
+                                                                        b = currentPointer + (second u)
+                                                                        c = third u
+                                                                    in  turing (a b c)
                     | otherwise = -1
 
 -- extracting from read/sr
