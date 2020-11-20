@@ -127,7 +127,6 @@ update s i tp t = let trans  = canTransition transitions (s,i)
                                        | a > 0  = x:(ntape (a-1) b xs)
                   in ((first trans), (tpoint (third trans)), (nTape tp (second trans) t))
 
-currentPointer = 1;
 -- pointer points to element in the tape. If the pointer is ever > or < the tape, add a blank element in front
 tape = inputTape
 -- take in current state, position of the pointer, tape, and input string
@@ -158,11 +157,12 @@ lexerParser l = sr (lexer l)
 lexer :: String -> [Token]
 lexer s = map classify (words (addSpaces s))
 
---
--- May have to go in main
 machine :: ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
-machine = -- output of lexerParser
 
+xInAlpha :: String -> Bool
+xInAlpha [] = True
+xInAlpha (x:xs) | x `elem` alphabet = xInAlpha xs
+                | otherwise = False
 
 states :: [State]
 states = first machine
@@ -188,6 +188,26 @@ final = seventh machine
 isFinal :: State -> Bool
 isFinal s = s `elem` states
 
+
+
+main :: IO()
+main = do
+    putStrLn "Enter file name: "
+    x <- getLine
+    contents <- readFile x
+    machine = lexerParser contents
+    let loop = do
+        putStrLn "Enter a string or quit command"
+        x <- getLine
+        case x of
+            "quit" -> do
+                putStrLn "Bye!"
+                return()
+            _ -> do
+                if xInAlpha x then turing start 1  -- something wrong
+                putStrLn x
+                loop
+    loop
 
 
 
