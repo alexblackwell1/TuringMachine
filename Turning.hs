@@ -50,8 +50,7 @@ sr (KeywordState x : xs) s t a tr st e f c | c == 1 = sr xs (x:s) t a tr st e f 
 sr (KeywordTape x : xs) s t a tr st e f c | c == 2 = sr xs s (x:t) a tr st e f c
                                           | c == 3 = sr xs s t (x:a) tr st e f c
                                           | c == 6 = sr xs s t a tr st a f c
-sr (Delta : LPar : KwS x1 : Comma : KwT x2 : RPar : Eql : KwS x3 : Comma : KwT x4 : Comma : Dir x5 : RPar : xs) s t a tr st e f c
-  = sr xs s t a (((x1, x2), (x3, x4, x5)):tr) st a f c
+sr (Delta : LPar : KwS x1 : Comma : KwT x2 : RPar : Eql : KwS x3 : Comma : KwT x4 : Comma : Dir x5 : RPar : xs) s t a tr st e f c = sr xs s t a (((x1, x2), (x3, x4, x5)):tr) st a f c
 sr [] s t a tr st e f _ = (s, t, a, tr, st, e, f)
 
 first :: a -> b
@@ -120,6 +119,7 @@ canTransition (t:ts) (s,a) | first (first t) == s && second (first t) == a = sec
 --take in currentState, head of the inputString, currentTapePointer, Tape
 --returns new State, new TapePosition, newTape
 update :: state -> String -> Integer -> String -> (State, Integer, String)
+-- ***********Will have to look for null cases here... not implemented*****************
 update s i tp t = let trans  = canTransition transitions (s,i)
                       tpoint a | a == L = -1
                                | a == R = 1
