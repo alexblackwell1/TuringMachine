@@ -224,8 +224,13 @@ main = do
                 putStrLn "Bye!"
                 return()
             _ -> do
-                if xInAlpha x then turing start 1  -- something wrong
-                putStrLn x
+                if xInAlpha x then (let run = turing start 1 x
+                                    in  if isFinal run then (putStrLn x 
+                                                            putStrLn " does accept")
+                                        else (putStrLn x
+                                              putStrLn " does NOT accept"))
+                              else (putStrLn x
+                                    putStrLn " is not a valid input")
                 loop
     loop
 
