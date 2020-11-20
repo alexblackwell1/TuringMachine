@@ -33,6 +33,7 @@ classify x | x == "d" || x == "D" = Delta
 classify x | isDirection x = Dir (toDirection x)
 classify x | isState x = KwS (toState x)
 classify x | isTapeA x = KwT x --one of the last parts that needs to be defined
+classify _ = Err
 
 -- input 0 for current. It stands for the current part of the tuple being processed
 sr :: [Token] -> [State] -> [TapeA] -> [TapeA] -> [Transition] -> State -> TapeA -> [State] -> Integer -> ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
@@ -91,9 +92,7 @@ isState ('q':x:xs) =
 isState _ = False
 
 toState :: String -> State
-toState ('q':xs)  = toState xs
-toState (x:xs)    = (read x) : toState xs
-toState []        = []
+toState ('q':xs)  = read xs
 
 -- Anything that can be in the INPUT or TAPE alphabet
 isTapeA :: String -> Bool
