@@ -1,7 +1,7 @@
 
 
 --Variables
-type State = int
+type State = Int
 type TapeA = Char
 type Direction = L | R
 data InTransition  = (State, TapeA)
@@ -36,7 +36,7 @@ classify x | isTapeA x = KwT x --one of the last parts that needs to be defined
 classify _ = Err
 
 -- input 0 for current. It stands for the current part of the tuple being processed
-sr :: [Token] -> [State] -> [TapeA] -> [TapeA] -> [Transition] -> State -> TapeA -> [State] -> Integer -> ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
+sr :: [Token] -> [State] -> [TapeA] -> [TapeA] -> [Transition] -> State -> TapeA -> [State] -> Int -> ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
 -- sr [] (x:xs) states tape alpha trans start empty final current = sr [x] xs states tape alpha trans start empty final current
 sr (LPar : xs) s t a tr st e f c  | c == 0 = sr xs s t a tr st e f (c+1)
 sr (RPar : xs) s t a tr st e f c  | c == 7 = sr xs s t a  tr st e f 4
@@ -118,7 +118,7 @@ canTransition (t:ts) (s,a) | first (first t) == s && second (first t) == a = sec
                            
 --take in currentState, head of the inputString, currentTapePointer, Tape
 --returns new State, new TapePosition, newTape
-update :: state -> String -> Integer -> String -> (State, Integer, String)
+update :: state -> String -> Int -> String -> (State, Int, String)
 update s i tp t = let trans  = canTransition transitions (s,i) 
                       tpoint a | a == L = -1
                                | a == R = 1
@@ -128,7 +128,7 @@ update s i tp t = let trans  = canTransition transitions (s,i)
                       else ((first trans), (tpoint (third trans)), (nTape tp (second trans) t))
 
 -- take in current state, position of the pointer, tape
-turing :: State -> Integer -> [TapeA] -> State
+turing :: State -> Int -> [TapeA] -> State
 turing -1 _ _ = -1
 --turing currentState _ _ [] = currentState
 turing s p (t:ts) | isValid t && s >= 0 && p > 0 && p < (length (t:ts)) = let u = update s p (t:ts)
@@ -147,6 +147,9 @@ turing s p (t:ts) | isValid t && s >= 0 && p > 0 && p < (length (t:ts)) = let u 
                                                                         c = third u
                                                                     in  turing (a b c)
                     | otherwise = -1
+
+state2Int :: State -> Int
+state2Int a = read a :: Int
 
 -- extracting from read/sr
 lexerParser :: String -> ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
