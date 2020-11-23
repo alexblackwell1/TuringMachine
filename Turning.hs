@@ -37,7 +37,6 @@ classify _ = Err
 
 -- input 0 for current. It stands for the current part of the tuple being processed
 sr :: [Token] -> [State] -> [TapeA] -> [TapeA] -> [Transition] -> State -> TapeA -> [State] -> Integer -> ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
--- I don't think we'll need the transition stack
 -- sr [] (x:xs) states tape alpha trans start empty final current = sr [x] xs states tape alpha trans start empty final current
 sr (LPar : xs) s t a tr st e f c  | c == 0 = sr xs s t a tr st e f (c+1)
 sr (RPar : xs) s t a tr st e f c  | c == 7 = sr xs s t a  tr st e f 4
@@ -53,6 +52,7 @@ sr (KeywordTape x : xs) s t a tr st e f c | c == 2 = sr xs s (x:t) a tr st e f c
                                           | c == 6 = sr xs s t a tr st a f c
 sr (Delta : LPar : KwS x1 : Comma : KwT x2 : RPar : Eql : KwS x3 : Comma : KwT x4 : Comma : Dir x5 : RPar : xs) s t a tr st e f c = sr xs s t a (((x1, x2), (x3, x4, x5)):tr) st a f c
 sr [] s t a tr st e f _ = (s, t, a, tr, st, e, f)
+sr (Err : xs) _ _ _ _ _ _ _ _ = error "Could not convert file"
 
 first :: a -> b
 first (x:xs) = x
@@ -111,42 +111,21 @@ toDirection "L" = L
 toDirection _ = error "invalid direction in reading"
 
 --[Transition] == [(InTransition, OutTransition)] == [( (State,Alpha) , (State,TapeA,Char) )]
-canTransition :: [Transition] -> InTransition -> Transition
+canTransition :: [Transition] -> InTransition -> OutTransition
 canTransition [] _ = null
 canTransition (t:ts) (s,a) | first (first t) == s && second (first t) == a = second t
                            | otherwise = canTransition ts (s,a)
+                           
 --take in currentState, head of the inputString, currentTapePointer, Tape
 --returns new State, new TapePosition, newTape
 update :: state -> String -> Integer -> String -> (State, Integer, String)
--- ***********Will have to look for null cases here... not implemented*****************
-update s i tp t = let trans  = canTransition transitions (s,i)
+update s i tp t = let trans  = canTransition transitions (s,i) 
                       tpoint a | a == L = -1
                                | a == R = 1
                       nTape a b (x:xs) | a == 0 = (b:xs)
                                        | a > 0  = x:(ntape (a-1) b xs)
-                  in ((first trans), (tpoint (third trans)), (nTape tp (second trans) t))
-
--- pointer points to element in the tape. If the pointer is ever > or < the tape, add a blank element in front
--- take in current state, position of the pointer, tape, and input string
---turing :: State -> Integer -> [TapeA] -> String -> State
---turing -1 _ _ _ = -1
---turing currentState _ _ [] = currentState
---turing s p t (x:xs) | isValid x && s >= 0 && p > 0 && p < (length t) =  let u = update s p t
---                                                                            a = first u
---                                                                            b = second u
---                                                                            c = currentPointer + (third u)
---                                                                        in  turing (a b c xs)
---                    | isValid x && s >= 0 && p == 0 = let u = update s 1 (blank:t)
---                                                          a = first u
---                                                          b = second u
---                                                          c = currentPointer + (third u)
---                                                      in  turing (a b c xs)
---                    | isValid x && s >= 0 && p > (length t) = let u = update s p (t++[blank])
---                                                                  a = first u
---                                                                  b = second u
---                                                                  c = currentPointer + (third u)
---                                                              in  turing (a b c xs)
---                    | otherwise = -1
+                  in  if trans == null then (-1, tp, t)
+                      else ((first trans), (tpoint (third trans)), (nTape tp (second trans) t))
 
 -- take in current state, position of the pointer, tape
 turing :: State -> Integer -> [TapeA] -> State
