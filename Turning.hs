@@ -1,9 +1,9 @@
-
+import Data.Maybe
 
 --Variables
 type State = Int
 type TapeA = Char
-data Direction = L | R
+data Direction = L | R deriving (Eq, Show)
 type InTransition = (State, TapeA)
 type OutTransition = (State, TapeA, Direction)
 type Transition = (InTransition, OutTransition)
@@ -11,16 +11,18 @@ type Transition = (InTransition, OutTransition)
 type Machine = ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
 
 -- File Template
---({q1, q2, q3, ...}; {0,1,a,b,_, ...}; {a,b,...}; D; q0; _; {q2, q3, ...})
+-- ({q1, q2, q3, ...}; {0,1,a,b,_, ...}; {a,b,...}; D; q0; _; {q2, q3, ...})
   -- d(q1, a) = (q3, 0, R)
   -- d(q3, 0) = (q1, a, L)
   -- ...
 -- where states DO start with q then # and the tape/alphabet cannot have characters that start with q or d/D
 -- where the tape alphabet includes the input alphabet and the blank symbol
 
+-- ( { q0 , q1 } ; { 0 , 1 , _ } ; { 0 , 1 } ; D ; q0 ; _ ; { q1 } ) d( q0 , 0 ) = ( q1 , 0 , R ) d ( q1 , 1 ) = ( q1 , 1 , R )
+
 data Token = Delta | KwS State | KwT TapeA | Dir Direction
   | Comma | Semi | LBracket | RBracket | LPar | RPar | Eql
-  | Err --deriving Show
+  | Err deriving Show
 
 classify :: String -> Token
 classify "=" = Eql
@@ -29,7 +31,6 @@ classify ")" = RPar
 classify "{" = LBracket
 classify "}" = RBracket
 classify "," = Comma
-classify ";" = Semi
 classify ";" = Semi
 classify x | x == "d" || x == "D" = Delta
 classify x | isDirection x = Dir (toDirection x)
@@ -114,17 +115,11 @@ toDirection "R" = R
 toDirection "L" = L
 toDirection _ = error "invalid direction in reading"
 
-isNothing :: Maybe a -> Bool
-isNothing x = x == Nothing
-
-fromJust :: Maybe a -> a
-fromJust (Just a) = a
-
 dir2Int :: Direction -> Int
 dir2Int a | a == L = -1
 		| otherwise = 1
 
---[Transition] == [(InTransition, OutTransition)] == [( (State,Alpha) , (State,TapeA,Direction) )]
+--[Transition] == [(InTransition, OutTransition)] == Maybe [( (State,Alpha) , (State,TapeA,Direction) )]
 canTransition :: [Transition] -> InTransition -> Maybe OutTransition
 canTransition [] _ = Nothing
 canTransition (t:ts) (s,a) | first2 (first2 t) == s && second2 (first2 t) == a = Just (second2 t)
@@ -155,7 +150,7 @@ turing m s p (t:ts) | isValid m t && s >= 0 && p > 0 && p < (length (t:ts)) = 	l
 
 -- extracting from read/sr
 lexerParser :: String -> Machine
-lexerParser l = sr (lexer l) [] [] [] [] 0 0 [] 0
+lexerParser l = sr (lexer l) [] [] [] [] 0 ' ' [] 0
 
 lexer :: String -> [Token]
 lexer s = map classify (words s)
@@ -190,13 +185,10 @@ main = do
                 return()
             _ -> do
                 if xInAlpha machine x then (let run = turing machine (fifth7 machine) 1 x
-                                    in  if (isFinal machine run) then (putStrLn x 
-                                                            putStrLn " does accept")
-                                        else (putStrLn x
-                                              putStrLn " does NOT accept"))
-                              else (putStrLn x
-                                    putStrLn " is not a valid input")
-                loop
+                                   in  if (isFinal machine run) then (putStrLn (x ++ " does accept"))
+                                        else (putStrLn (x ++ " does NOT accept"))
+                else (putStrLn (x ++ " is not a valid input"))
+            loop
     loop
 
 
