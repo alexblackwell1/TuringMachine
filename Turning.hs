@@ -184,12 +184,9 @@ main = do
                 putStrLn "Bye!"
                 return()
             _ -> do
-                if xInAlpha machine x then (let run = turing machine (fifth7 machine) 1 x
-                                   in  if (isFinal machine run) then (putStrLn (x ++ " does accept"))
-                                        else (putStrLn (x ++ " does NOT accept"))
-                else (putStrLn (x ++ " is not a valid input"))
+                if xInAlpha machine x then 	let run = turing machine (fifth7 machine) 1 x
+											in  if (isFinal machine run) then putStrLn (x ++ " does accept")
+												else putStrLn (x ++ " does NOT accept")
+                else putStrLn (x ++ " is not a valid input")
             loop
     loop
-
-
-
