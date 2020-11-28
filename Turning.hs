@@ -18,7 +18,7 @@ type Machine = ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
 -- where states DO start with q then # and the tape/alphabet cannot have characters that start with q or d/D
 -- where the tape alphabet includes the input alphabet and the blank symbol
 
--- ( { q0 , q1 } ; { 0 , 1 , _ } ; { 0 , 1 } ; D ; q0 ; _ ; { q1 } ) d( q0 , 0 ) = ( q1 , 0 , R ) d ( q1 , 1 ) = ( q1 , 1 , R )
+-- ( { q0 , q1 } ; { 0 , 1 , _ } ; { 0 , 1 } ; D ; q0 ; _ ; { q1 } ) d ( q0 , 0 ) = ( q1 , 0 , R ) d ( q1 , 1 ) = ( q1 , 1 , R )
 
 data Token = Delta | KwS State | KwT TapeA | Dir Direction
   | Comma | Semi | LBracket | RBracket | LPar | RPar | Eql
@@ -53,9 +53,11 @@ sr (KwS x : xs) s t a tr st e f c | c == 1 = sr xs (x:s) t a tr st e f c
 sr (KwT x : xs) s t a tr st e f c | c == 2 = sr xs s (x:t) a tr st e f c
                                           | c == 3 = sr xs s t (x:a) tr st e f c
                                           | c == 6 = sr xs s t a tr st x f c
-sr (Delta : LPar : KwS x1 : Comma : KwT x2 : RPar : Eql : KwS x3 : Comma : KwT x4 : Comma : Dir x5 : RPar : xs) s t a tr st e f c = sr xs s t a (((x1, x2), (x3, x4, x5)):tr) st e f c
+sr (Delta : LPar : KwS x1 : Comma : KwT x2 : RPar : Eql : LPar : KwS x3 : Comma : KwT x4 : Comma : Dir x5 : RPar : xs) s t a tr st e f c = sr xs s t a (((x1, x2), (x3, x4, x5)):tr) st e f c
+sr (Delta : xs) s t a tr st e f c | c == 4 = sr xs s t a tr st e f c
 sr [] s t a tr st e f _ = (s, t, a, tr, st, e, f)
 sr (Err : xs) _ _ _ _ _ _ _ _ = error "Could not convert file"
+sr (x : xs) _ _ _ _ _ _ _ _ = error (show (x : xs))
 
 extractKwT :: String -> TapeA --Already checked if the string is TapeA
 extractKwT (x:xs) = x :: TapeA
@@ -139,7 +141,7 @@ update2 m s i tp t trans = let nTape a b (x:xs) | a == 0 = (b:xs)
 -- take in current state, position of the pointer, tape
 turing :: Machine -> State -> Int -> [TapeA] -> State
 turing _ s _ _ | s == -1 = -1
---turing currentState _ _ [] = currentState
+turing _ currentState _ [] = currentState
 turing m s p (t:ts) | isValid m t && s >= 0 && p > 0 && p < (length (t:ts)) = 	let u = update m s t p (t:ts)
 																				in  turing m (first3 u) (p + (second3 u)) (third3 u)
                     | isValid m t && s >= 0 && p == 0 = let u = update m s t 1 ((sixth7 m):t:ts)
@@ -188,23 +190,5 @@ main = do
 												in  if (isFinal machine run) then putStrLn (x ++ " does accept")
 													else putStrLn (x ++ " does NOT accept")
 					else putStrLn (x ++ " is not a valid input")
-			loop
-		in loop
-    -- let loop = do
-        -- putStrLn "Enter a string or quit command"
-        -- x <- getLine
-        -- case x of
-            -- "quit" -> do
-                -- putStrLn "Bye!"
-                -- return()
-            -- _ -> do
-                -- if xInAlpha machine x then 	let run = turing machine (fifth7 machine) 1 x
-											-- in  if (isFinal machine run) then putStrLn (x ++ " does accept")
-												-- else putStrLn (x ++ " does NOT accept")
-                -- else putStrLn (x ++ " is not a valid input")
-            -- loop
-    -- loop
---
-    
-
+			in loop
 
