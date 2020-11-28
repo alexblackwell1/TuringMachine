@@ -190,5 +190,6 @@ main = do
 												in  if (isFinal machine run) then putStrLn (x ++ " does accept")
 													else putStrLn (x ++ " does NOT accept")
 					else putStrLn (x ++ " is not a valid input")
-			in loop
+					loop
+		in loop
 
