@@ -176,17 +176,48 @@ main = do
     x <- getLine
     contents <- readFile x
     let machine = lexerParser contents
-    let loop = do
-        putStrLn "Enter a string or quit command"
-        x <- getLine
-        case x of
-            "quit" -> do
-                putStrLn "Bye!"
-                return()
-            _ -> do
-                if xInAlpha machine x then 	let run = turing machine (fifth7 machine) 1 x
-											in  if (isFinal machine run) then putStrLn (x ++ " does accept")
-												else putStrLn (x ++ " does NOT accept")
-                else putStrLn (x ++ " is not a valid input")
-            loop
-    loop
+	in 	let loop = do
+			putStrLn "Enter a string or quit command"
+			x <- getLine
+			case x of
+				"quit" -> do
+					putStrLn "Bye!"
+					return()
+				_ -> do
+					if xInAlpha machine x then 	let run = turing machine (fifth7 machine) 1 x
+												in  if (isFinal machine run) then putStrLn (x ++ " does accept")
+													else putStrLn (x ++ " does NOT accept")
+					else putStrLn (x ++ " is not a valid input")
+			loop
+		in loop
+	-- putStrLn ("Enter a string or quit command")
+	-- x <- getLine
+    -- case x of
+        -- "quit" -> do
+			-- putStrLn "Bye!"
+            -- return()
+		-- _ -> do
+			-- if xInAlpha machine x then 	let run = turing machine (fifth7 machine) 1 x
+										-- in  if (isFinal machine run) then putStrLn (x ++ " does accept")
+											-- else putStrLn (x ++ " does NOT accept")
+			-- else putStrLn (x ++ " is not a valid input")
+	-- main
+--
+    -- let loop = do
+        -- putStrLn "Enter a string or quit command"
+        -- x <- getLine
+        -- case x of
+            -- "quit" -> do
+                -- putStrLn "Bye!"
+                -- return()
+            -- _ -> do
+                -- if xInAlpha machine x then 	let run = turing machine (fifth7 machine) 1 x
+											-- in  if (isFinal machine run) then putStrLn (x ++ " does accept")
+												-- else putStrLn (x ++ " does NOT accept")
+                -- else putStrLn (x ++ " is not a valid input")
+            -- loop
+    -- loop
+--
+    
+
+
