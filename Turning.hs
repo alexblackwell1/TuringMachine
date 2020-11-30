@@ -129,29 +129,31 @@ canTransition (t:ts) (s,a) | first2 (first2 t) == s && second2 (first2 t) == a =
                            
 --take in currentState, currentElement, currentTapePointer, Tape
 --returns new State, new TapePosition, newTape
-update :: Machine -> State -> TapeA -> Int -> [TapeA] -> (State, Int, [TapeA])
+-- update :: Machine -> State -> TapeA -> Int -> [TapeA] -> (State, Int, [TapeA])
 -- update m s i tp t | isNothing (canTransition (fourth7 m) (s,i)) = (-1, tp, t)
-update m s i tp t = update2 m s i tp t (fromJust (canTransition (fourth7 m) (s,i)))
+-- update m s i tp t = update2 m s i tp t (fromJust (canTransition (fourth7 m) (s,i)))
 
 -- JUST updates the tape charater at the nth position (whatever the pointer is pointing to)
-update2 :: Machine -> State -> TapeA -> Int -> [TapeA] -> OutTransition -> (State, Int, [TapeA])
-update2 m s i tp t trans = 	let nTape a b (x:xs)	| a == 1 = (b:xs)
+update :: Machine -> State -> TapeA -> Int -> [TapeA] -> OutTransition -> (State, Int, [TapeA])
+update m s i tp t trans = 	let nTape a b (x:xs)	| a == 1 = (b:xs)
 													| a > 1  = x:(nTape (a-1) b xs)
 							in (first3 trans, dir2Int (third3 trans), nTape tp (second3 trans) t)
 
 newElement :: Machine -> Int -> [TapeA] -> TapeA
-newElement m a t 	| a >= 1 && a <= length t = t!!a
-					| otherwise = (sixth7 m)
+newElement m a []	| a == 1 = sixth7 m
+					| otherwise = error "Length of tape is < pointer"
+newElement m a (t:ts) 	| a > 1 = newElement m (a-1) ts
+						| otherwise = t
 
 -- take in current state, position of the pointer, tape
 turing :: Machine -> State -> Int -> TapeA -> [TapeA] -> State
 turing _ s _ _ _ | s < 0 = -1
-turing m s p ce t 	| ce == (sixth7 m) && isNothing (canTransition (fourth7 m) (s,ce)) = s
-					| isValid m ce && p >= 1 && p <= (length t) && not (isNothing (canTransition (fourth7 m) (s,ce))) = let u = update m s ce p t				-- [0] -> [0] 2
-																														in  turing m (first3 u) (p + (second3 u)) (newElement m (p + (second3 u)) (third3 u)) (third3 u)
-                    | isValid m ce && p == 0 && not (isNothing (canTransition (fourth7 m) (s,ce))) = 	let u = update m s ce 1 ((sixth7 m):t)
+turing m s p ce t 	| (p < 1 || p > length t || ce == (sixth7 m)) && isNothing (canTransition (fourth7 m) (s,ce)) = s
+					| isValid m ce && p >= 1 && p <= (length t) && not (isNothing (canTransition (fourth7 m) (s,ce))) = let u = update m s ce p t (fromJust (canTransition (fourth7 m) (s,ce)))
+																														in turing m (first3 u) (p + (second3 u)) (newElement m (p + (second3 u)) (third3 u)) (third3 u)
+                    | isValid m ce && p == 0 && not (isNothing (canTransition (fourth7 m) (s,ce))) = 	let u = update m s ce 1 ((sixth7 m):t) (fromJust (canTransition (fourth7 m) (s,ce)))
 																										in  turing m (first3 u) (p + (second3 u)) (newElement m (p + (second3 u)) (third3 u)) (third3 u)
-                    | isValid m ce && p > (length t) && not (isNothing (canTransition (fourth7 m) (s,ce))) =	let u = update m s ce p (t++[(sixth7 m)])
+                    | isValid m ce && p > (length t) && not (isNothing (canTransition (fourth7 m) (s,ce))) =	let u = update m s ce p (t++[(sixth7 m)]) (fromJust (canTransition (fourth7 m) (s,ce)))
 																												in  turing m (first3 u) (p + (second3 u)) (newElement m (p + (second3 u)) (third3 u)) (third3 u)
 					| otherwise = -1
 -- turing m s p (t:ts) | t == (sixth7 m) && isNothing (canTransition (fourth7 m) (s,t)) = s
