@@ -7,7 +7,7 @@ data Direction = L | R deriving (Eq, Show)
 type InTransition = (State, TapeA)
 type OutTransition = (State, TapeA, Direction)
 type Transition = (InTransition, OutTransition)
---				states	alpha	tape-alpha	transitions	start	blank	final
+--		states	alpha	tape-alpha	transitions	start	blank	final
 type Machine = ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
 
 -- File Template
@@ -156,6 +156,8 @@ turing m s p ce t 	| (p < 1 || p > length t || ce == (sixth7 m)) && isNothing (c
                     | isValid m ce && p > (length t) && not (isNothing (canTransition (fourth7 m) (s,ce))) =	let u = update m s ce p (t++[(sixth7 m)]) (fromJust (canTransition (fourth7 m) (s,ce)))
 																												in  turing m (first3 u) (p + (second3 u)) (newElement m (p + (second3 u)) (third3 u)) (third3 u)
 					| otherwise = -1
+-- take out otherwise line and change the 1st case condition to only isNothing
+
 -- turing m s p (t:ts) | t == (sixth7 m) && isNothing (canTransition (fourth7 m) (s,t)) = s
 					-- | isValid m t && p >= 1 && p <= (length (t:ts)) && not (isNothing (canTransition (fourth7 m) (s,t))) = 	let u = update m s t p (t:ts)
 																															-- in  turing m (first3 u) (p + (second3 u)) (third3 u)
