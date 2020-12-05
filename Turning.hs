@@ -7,7 +7,7 @@ data Direction = L | R deriving (Eq, Show)
 type InTransition = (State, TapeA)
 type OutTransition = (State, TapeA, Direction)
 type Transition = (InTransition, OutTransition)
---		states	alpha	tape-alpha	transitions	start	blank	final
+--				states	alpha	tape-alpha	transitions	start	blank	final
 type Machine = ([State], [TapeA], [TapeA], [Transition], State, TapeA, [State])
 
 -- File Template
@@ -156,8 +156,6 @@ turing m s p ce t 	| (p < 1 || p > length t || ce == (sixth7 m)) && isNothing (c
                     | isValid m ce && p > (length t) && not (isNothing (canTransition (fourth7 m) (s,ce))) =	let u = update m s ce p (t++[(sixth7 m)]) (fromJust (canTransition (fourth7 m) (s,ce)))
 																												in  turing m (first3 u) (p + (second3 u)) (newElement m (p + (second3 u)) (third3 u)) (third3 u)
 					| otherwise = -1
--- take out otherwise line and change the 1st case condition to only isNothing
-
 -- turing m s p (t:ts) | t == (sixth7 m) && isNothing (canTransition (fourth7 m) (s,t)) = s
 					-- | isValid m t && p >= 1 && p <= (length (t:ts)) && not (isNothing (canTransition (fourth7 m) (s,t))) = 	let u = update m s t p (t:ts)
 																															-- in  turing m (first3 u) (p + (second3 u)) (third3 u)
@@ -189,14 +187,18 @@ isFinal m s = s `elem` (seventh7 m)
 isValid :: Machine -> TapeA -> Bool
 isValid m x = x `elem` (third7 m)
 
-
+addSpaces :: String -> Bool -> String
+addSpaces [] _ = []
+addSpaces (x:xs) b 	| x == 'q' || (b && isDigit x) = x : addSpaces xs True
+					| b && not (isDigit x) = " " ++ x : " " ++ addSpaces xs False
+					| otherwise = x : " " ++ addSpaces xs False
 
 main :: IO()
 main = do
     putStrLn "Enter file name: "
     x <- getLine
     contents <- readFile x
-    let machine = lexerParser contents
+    let machine = lexerParser (addSpaces contents False)
 	in 	let loop = do
 			putStrLn "Enter a string or quit command"
 			y <- getLine
